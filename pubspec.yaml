@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   salomon_bottom_bar: ^3.3.1
   http: ^0.13.3
+  flutter_blue: ^0.8.0
 
 
   # The following adds the Cupertino Icons font to your application.
