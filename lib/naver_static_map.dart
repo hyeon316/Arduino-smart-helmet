@@ -1,5 +1,4 @@
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class NaverStaticMap {
   final String _apiKeyId = 'tzoepfxqm2';

@@ -17,7 +17,6 @@ class NaverDirections {
     );
 
     if (response.statusCode == 200) {
-      // Explicitly decode response body as UTF-8
       final decodedBody = utf8.decode(response.bodyBytes);
       return json.decode(decodedBody) as Map<String, dynamic>;
     } else {

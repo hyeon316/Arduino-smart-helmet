@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class GoogleBottomBar extends StatefulWidget {
-  const GoogleBottomBar({Key? key}) : super(key: key);
+  const GoogleBottomBar({super.key});
 
   @override
   State<GoogleBottomBar> createState() => _GoogleBottomBarState();
