@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-import 'bluetooth_service.dart';
 import 'directions_page.dart';
 import 'likes_page.dart';
+import 'search_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,19 +35,19 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const DirectionsPage(),
     const LikesPage(),
-    const Center(child: Text("Search Page")), // Placeholder for Search page
-    const Center(child: Text("Profile Page")), // Placeholder for Profile page
+    const SearchPage(), // 검색 페이지 추가
+    const Center(child: Text("Profile Page")), // 프로필 페이지
   ];
 
   @override
   void initState() {
     super.initState();
-    MyBluetoothService.instance.startScan();
+    // Bluetooth 초기화 관련 코드 제거
   }
 
   @override
   void dispose() {
-    MyBluetoothService.instance.disconnect();
+    // Bluetooth 연결 해제 관련 코드 제거
     super.dispose();
   }
 
