@@ -25,6 +25,12 @@ class _LikesPageState extends State<LikesPage> {
   }
 
   @override
+  void dispose() {
+    MyBluetoothService.instance.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(

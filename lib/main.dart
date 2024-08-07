@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';  // 추가
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'directions_page.dart';
 import 'likes_page.dart';
 import 'search_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _requestPermissions();
   runApp(const MyApp());
+}
+
+Future<void> _requestPermissions() async {
+  await [
+    Permission.bluetooth,
+    Permission.bluetoothScan,
+    Permission.bluetoothConnect,
+    Permission.bluetoothAdvertise,
+    Permission.location,
+  ].request();
 }
 
 class MyApp extends StatelessWidget {
@@ -27,28 +40,21 @@ class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
-  _MainPageState createState() => _MainPageState();
+  MainPageState createState() => MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
     const DirectionsPage(),
     const LikesPage(),
-    const SearchPage(), // 검색 페이지 추가
-    const Center(child: Text("Profile Page")), // 프로필 페이지
+    const SearchPage(),
+    const Center(child: Text("Profile Page")),
   ];
 
   @override
   void initState() {
     super.initState();
-    // Bluetooth 초기화 관련 코드 제거
-  }
-
-  @override
-  void dispose() {
-    // Bluetooth 연결 해제 관련 코드 제거
-    super.dispose();
   }
 
   @override

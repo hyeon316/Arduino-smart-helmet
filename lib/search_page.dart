@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'bluetooth_service.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -15,6 +16,14 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    final BluetoothState state = await FlutterBluetoothSerial.instance.state;
+    if (state == BluetoothState.STATE_OFF) {
+      await FlutterBluetoothSerial.instance.requestEnable();
+    }
     _startDiscovery();
   }
 
@@ -27,7 +36,7 @@ class _SearchPageState extends State<SearchPage> {
     FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
       setState(() {
         final existingIndex = _devicesList.indexWhere(
-          (element) => element.device.address == r.device.address,
+              (element) => element.device.address == r.device.address,
         );
         if (existingIndex >= 0) {
           _devicesList[existingIndex] = r;
@@ -43,13 +52,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _connectToDevice(BluetoothDevice device) async {
-    try {
-      BluetoothConnection connection =
-          await BluetoothConnection.toAddress(device.address);
-      print('Connected to the device');
-    } catch (error) {
-      print('Failed to connect: $error');
-    }
+    await MyBluetoothService.instance.connectToDevice(device);
   }
 
   @override
@@ -60,15 +63,15 @@ class _SearchPageState extends State<SearchPage> {
         actions: [
           _isDiscovering
               ? const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+            padding: EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          )
               : IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _startDiscovery,
-                ),
+            icon: const Icon(Icons.refresh),
+            onPressed: _startDiscovery,
+          ),
         ],
       ),
       body: ListView.builder(

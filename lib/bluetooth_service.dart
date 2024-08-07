@@ -1,45 +1,32 @@
-import 'package:flutter_blue/flutter_blue.dart';
+import 'dart:async';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 class MyBluetoothService {
-  MyBluetoothService._privateConstructor();
-  static final MyBluetoothService instance = MyBluetoothService._privateConstructor();
+  static final MyBluetoothService instance = MyBluetoothService._internal();
 
-  FlutterBlue flutterBlue = FlutterBlue.instance;
-  BluetoothDevice? connectedDevice;
-  BluetoothCharacteristic? characteristic;
-  Stream<List<int>>? alertStream;
+  BluetoothConnection? _connection;
+  StreamController<List<int>> _alertStreamController = StreamController.broadcast();
 
-  void startScan() {
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+  Stream<List<int>>? get alertStream => _alertStreamController.stream;
 
-    flutterBlue.scanResults.listen((results) {
-      for (ScanResult result in results) {
-        if (result.device.name == 'HC-06') {
-          flutterBlue.stopScan();
-          connectToDevice(result.device);
-          break;
-        }
-      }
-    });
-  }
+  MyBluetoothService._internal();
 
-  void connectToDevice(BluetoothDevice device) async {
-    await device.connect();
-    connectedDevice = device;
-
-    List<BluetoothService> services = await device.discoverServices();
-    for (var service in services) {
-      for (var characteristic in service.characteristics) {
-        if (characteristic.properties.notify) {
-          this.characteristic = characteristic;
-          alertStream = this.characteristic?.value;
-          this.characteristic?.setNotifyValue(true);
-        }
-      }
+  Future<void> connectToDevice(BluetoothDevice device) async {
+    try {
+      _connection = await BluetoothConnection.toAddress(device.address);
+      print('Connected to the device');
+      _connection?.input?.listen((data) {
+        _alertStreamController.add(data);
+      }).onDone(() {
+        print('Disconnected from device');
+      });
+    } catch (error) {
+      print('Failed to connect: $error');
     }
   }
 
-  void disconnect() {
-    connectedDevice?.disconnect();
+  void dispose() {
+    _connection?.dispose();
+    _alertStreamController.close();
   }
 }
