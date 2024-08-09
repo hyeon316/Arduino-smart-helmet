@@ -5,7 +5,7 @@ class MyBluetoothService {
   static final MyBluetoothService instance = MyBluetoothService._internal();
 
   BluetoothConnection? _connection;
-  StreamController<List<int>> _alertStreamController = StreamController.broadcast();
+  final StreamController<List<int>> _alertStreamController = StreamController.broadcast();
 
   Stream<List<int>>? get alertStream => _alertStreamController.stream;
 
