@@ -24,18 +24,18 @@ class _LikesPageState extends State<LikesPage> {
     });
   }
 
-  @override
-  void dispose() {
-    MyBluetoothService.instance.dispose();
-    super.dispose();
-  }
-
+  // dispose 메서드에서 MyBluetoothService의 dispose를 호출하지 않음
+  // 이로 인해 블루투스 연결이 유지됩니다.
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
         alertMessage,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.red),
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.red,
+        ),
       ),
     );
   }
