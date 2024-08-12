@@ -15,16 +15,26 @@ class _SearchPageState extends State<SearchPage> {
   bool _isDiscovering = false;
   BluetoothDevice? _connectedDevice;
   StreamSubscription<BluetoothDiscoveryResult>? _discoveryStreamSubscription;
+  StreamSubscription<void>? _disconnectionSubscription;
 
   @override
   void initState() {
     super.initState();
     _checkBluetoothState();
+
+    // 연결이 끊어졌을 때의 이벤트를 감지하고 처리
+    _disconnectionSubscription = MyBluetoothService.instance.disconnectionStream.listen((_) {
+      setState(() {
+        _connectedDevice = null;
+        _startDiscovery();
+      });
+    });
   }
 
   @override
   void dispose() {
     _discoveryStreamSubscription?.cancel();
+    _disconnectionSubscription?.cancel();
     super.dispose();
   }
 
