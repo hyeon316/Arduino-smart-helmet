@@ -11,8 +11,8 @@ class NaverGeocode {
     final response = await http.get(
       Uri.parse(url),
       headers: {
-        'X-NCP-APIGW-API-KEY-ID': _apiKeyId,
-        'X-NCP-APIGW-API-KEY': _apiKey,
+        'tzoepfxqm2': _apiKeyId,
+        'KlH2BScuJJmSThleZ3l1sy1q80dmHaohe7ay9LHb': _apiKey,
       },
     );
 

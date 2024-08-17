@@ -1,7 +1,7 @@
-import 'dart:async'; // 추가된 import
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'bluetooth_service.dart';
+import 'my_bluetooth_service.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -22,7 +22,6 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
     _checkBluetoothState();
 
-    // 연결이 끊어졌을 때의 이벤트를 감지하고 처리
     _disconnectionSubscription = MyBluetoothService.instance.disconnectionStream.listen((_) {
       setState(() {
         _connectedDevice = null;
