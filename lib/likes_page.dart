@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart'; // 추가된 부분
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart'; // 추가된 부분
 import 'my_bluetooth_service.dart';
 
 class LikesPage extends StatefulWidget {
@@ -17,12 +20,15 @@ class _LikesPageState extends State<LikesPage> {
   String alertMessage = '안전운전하세요';
   int _secondsRemaining = 5;
   Timer? _timer;
+  String _currentLocation = ''; // 현재 위치를 저장하는 변수
 
   @override
   void initState() {
     super.initState();
 
-    MyBluetoothService.instance.alertStream?.listen((data) {
+    _determinePosition();
+
+    MyBluetoothService.instance.alertStream.listen((data) {
       String receivedMessage = utf8.decode(data).trim();
       print('Received message: $receivedMessage');
       if (receivedMessage.contains('응급상황')) {
@@ -41,10 +47,44 @@ class _LikesPageState extends State<LikesPage> {
     });
   }
 
+  // 현재 위치 가져오기
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // 위치 서비스 사용 가능 여부 확인
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('위치 서비스를 사용할 수 없습니다.');
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('위치 권한이 거부되었습니다.');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('위치 권한이 영구적으로 거부되었습니다.');
+      return;
+    }
+
+    // 위치 가져오기
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      _currentLocation = '${position.latitude}, ${position.longitude}';
+    });
+  }
+
   void _startTimer() {
     _timer?.cancel();
     _secondsRemaining = 5;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
       setState(() {
         if (_secondsRemaining > 0) {
           _secondsRemaining--;
@@ -65,20 +105,20 @@ class _LikesPageState extends State<LikesPage> {
   }
 
   Future<void> _sendHelpMessage() async {
-    // SMS 권한 상태 확인
     var status = await Permission.sms.status;
     if (status.isGranted) {
       try {
-        final String result = await platform.invokeMethod('sendSMS', {"number": "0000", "message": "help"});
+        String message = "응급상황 발생! 위치: $_currentLocation";
+        final String result = await platform.invokeMethod('sendSMS', {"number": "0000", "message": message});
         print(result);
       } on PlatformException catch (e) {
         print("Failed to send SMS: '${e.message}'.");
       }
     } else {
-      // 권한이 부여되지 않았으면 요청
       if (await Permission.sms.request().isGranted) {
         try {
-          final String result = await platform.invokeMethod('sendSMS', {"number": "0000", "message": "help"});
+          String message = "응급상황 발생! 위치: $_currentLocation";
+          final String result = await platform.invokeMethod('sendSMS', {"number": "0000", "message": message});
           print(result);
         } on PlatformException catch (e) {
           print("Failed to send SMS: '${e.message}'.");
