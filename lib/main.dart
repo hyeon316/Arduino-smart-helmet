@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-import 'directions_page.dart';
+import 'score.dart';
 import 'likes_page.dart';
 import 'search_page.dart';
 
@@ -46,7 +46,7 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
-    const DirectionsPage(),
+    const ScorePage(), // ScorePage로 변경
     const LikesPage(),
     const SearchPage(),
     const Center(child: Text("Profile Page")),
